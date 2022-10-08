@@ -78,5 +78,65 @@ def preprocess_image_rt(self, image):
 
 ***Test Aşaması***
 Modeli test etmek için küçük ve etiketsiz bir dataset kullanıldı. Görseller aynı veya farklı insanlara ait olması durumlarına karşılık 1 - 0 şeklinde etiketlendi. Her bir görsel (kendisi dahil) birbiriyle karşılaştırıldı.
+
 Dataset:
 ![image](https://user-images.githubusercontent.com/86806643/194710617-85441116-d7e7-4917-872e-2165b6f0b1a8.png)
+```python 
+from vggfacecomparison import FaceVerification
+import os
+import cv2 as cv
+import numpy as np
+fv = FaceVerification(0.35)
+dataset_path = "C:/Users/Zeynep/Desktop/dataset"
+img_names = os.listdir(dataset_path)
+labels = []
+distances = []
+predictions= []
+truths = []
+names = []
+count = 0
+for i in range(len(img_names)):
+    for j in range(len(img_names)):
+        im1 = img_names[i]
+        im2 = img_names[j]
+        name = im1 + '-' +im2
+        names.append(name)
+        count +=1
+        abs_im1 = os.path.join(dataset_path, im1)
+        abs_im2 = os.path.join(dataset_path, im2)
+        readim1 = cv.imread(abs_im1)
+        readim2 = cv.imread(abs_im2)
+        prediction, distance = fv.verifyFace(readim1, readim2)
+        predictions.append(prediction)
+        distances.append(distance)
+        label = 0
+        if im1[0] == im2[0]:
+            label = 1
+        truth = 1 if label == prediction else 0
+        labels.append(label)
+        truths.append(truth)
+        if count %100 ==0:
+            print(count)
+distances = np.array(distances)
+labels = np.array(labels)
+truths = np.array(truths)
+names = np.array(names)
+predictions = np.array(predictions)
+np.save('predictions.npy', predictions)
+np.save('distances.npy', distances)
+np.save('labels.npy', labels)
+np.save('truths.npy', truths)
+np.save('names.npy', names)
+```
+
+"Names" sütununda karşılaştırılan görsel isimlerine
+"Labels" sütununda atanan etiketlere
+"Predictions" sütununda modelin çıktısına
+"Distances " sütununda predictionda kullanılan cosine distance değerine
+"Truths" sütununda XNOR mantığıyla etiketlemelerin ve modelin çıktısının uyumuna yer verilmiştir.
+
+![image](https://user-images.githubusercontent.com/86806643/194710675-1a82c308-df53-4c3f-8bc7-e29198e51450.png)
+
+* Gerçekleştirilen 946 karşılaştırmada 63 yanlış tahmin yapıldı.
+* %93,33 oranında doğruluğa sahip olduğu görüldü.
+* Datasetteki kişilerin genç, yaşlı, gözlüklü, gözlüksüz, sakallı, sakalsız görsellerinin karşılaştırıldığı da göz önüne alınarak değerlendirildiğinde yeterli bir orana sahiptir.
