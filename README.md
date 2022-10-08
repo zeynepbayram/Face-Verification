@@ -12,6 +12,15 @@
         self.verifier = load_model("busonmodel.h5") 
         self.epsilon = epsilon
 ```
+* Caffe Face Detector modeli, ve daha önce kaydedilen vgg-face verification modeli yükleniyor.
 
+```python 
+def preprocess_image_rt(self, image): 
+        img = cv2.resize(image, (224, 224)) 
+        img = img_to_array(img) 
+        img = np.expand_dims(img, axis=0) 
+        img = preprocess_input(img) 
+        return img
+```
 
 
