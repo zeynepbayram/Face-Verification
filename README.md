@@ -4,14 +4,14 @@
 ![image](https://user-images.githubusercontent.com/86806643/194709994-527228ef-5e02-4c33-9524-222d0768551a.png)
 ![image](https://user-images.githubusercontent.com/86806643/194710029-6ec67914-5918-4414-84f0-14077ca60891.png)
 ![image](https://user-images.githubusercontent.com/86806643/194710141-b99d004d-89d5-4e8e-9c3e-bd1878d531b0.png)
-'''python
+```python
    def __init__(self, epsilon = 0.40): 
         print("Building Caffe Face Detector..") 
         self.face_detector = cv2.dnn.readNetFromCaffe("C:/Users/Zeynep/Desktop/SVMfaceR/deploy.prototxt.txt", "C:/Users/Zeynep/Desktop/SVMfaceR/res10_300x300_ssd_iter_140000.caffemodel") 
         print("Building Verifier..") 
         self.verifier = load_model("busonmodel.h5") 
         self.epsilon = epsilon
-'''
+```
 
 
 
