@@ -37,3 +37,46 @@ def preprocess_image_rt(self, image):
 * ![image](https://user-images.githubusercontent.com/86806643/194710474-193c4185-75a8-4a54-8988-dff60502e2e9.png)
 * Cosine Similarity Formulünü kullanarak verilen 2 girdinin benzerliği hesaplanıyor.
 * 1'den cosine similarity değerini (benzerlik oranı) çıkardığımızda ise girdilerin farkı bulunuyor.(Cosine Distance)
+
+```python 
+ def get_face_ssdnet(self, frame, image_size = 224): 
+        (h, w) = frame.shape[:2] 
+        resized_image = cv2.resize(frame, (300, 300)) 
+        blob = cv2.dnn.blobFromImage(resized_image, 1.0, (300, 300), (104.0, 177.0, 123.0)) 
+        self.face_detector.setInput(blob) 
+        detections = self.face_detector.forward() 
+        box = detections[0, 0, 0, 3:7] * np.array([w, h, w, h]) 
+        (startX, startY, endX, endY) = box.astype("int32") 
+        face = frame[startY:endY, startX:endX] 
+        cv2.rectangle(frame, (startX, startY), (endX, endY), (42, 64, 127), 2) 
+        return face
+```
+* Face verification aşamasına geçebilmek için daha önce yüklenilen caffe modeli kullanılarak face detect edilir.
+
+```python 
+ def verifyFace(self, img1, img2): 
+        img1 = self.get_face_ssdnet(img1) 
+        img2 = self.get_face_ssdnet(img2) 
+        img1_representation = self.verifier.predict(self.preprocess_image_rt(img1))[0,:] 
+        img2_representation = self.verifier.predict(self.preprocess_image_rt(img2))[0,:] 
+        cosine_similarity = self.findCosineSimilarity(img1_representation, img2_representation) 
+         
+        if(cosine_similarity < self.epsilon): 
+            return 1, cosine_similarity 
+        else: 
+            return 0, cosine_similarity
+```
+
+* Model çıktısının uzaklıkları belirlenen epsilon değerinden küçükse 1 döndür ve verification işlemi tamamlanır. Değilse 0 döndürür.
+
+```python 
+    def barcode(self, frame): 
+            for code in decode(frame): 
+                return code.data.decode("utf-8")
+```
+* Pyzbar library fonksiyonları kullanılarak barkod decode edilir.
+
+***Test Aşaması***
+Modeli test etmek için küçük ve etiketsiz bir dataset kullanıldı. Görseller aynı veya farklı insanlara ait olması durumlarına karşılık 1 - 0 şeklinde etiketlendi. Her bir görsel (kendisi dahil) birbiriyle karşılaştırıldı.
+Dataset:
+![image](https://user-images.githubusercontent.com/86806643/194710617-85441116-d7e7-4917-872e-2165b6f0b1a8.png)
