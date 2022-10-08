@@ -22,5 +22,18 @@ def preprocess_image_rt(self, image):
         img = preprocess_input(img) 
         return img
 ```
+* VGG modeli 224x224x3 boyutlu girdileri kabul ettiği için modele verilecek görüntüler resize ediliyor.
+* PIL görseli numpy dizisine çevriliyor. (img_to_array)
+* preprocess_input işlemiyle görüntü normalize ediliyor.
 
+```python 
+ def findCosineSimilarity(self, source_representation, test_representation): 
+        a = np.matmul(np.transpose(source_representation), test_representation) 
+        b = np.sum(np.multiply(source_representation, source_representation)) 
+        c = np.sum(np.multiply(test_representation, test_representation)) 
+        return 1 - (a / (np.sqrt(b) * np.sqrt(c)))
+```
 
+* ![image](https://user-images.githubusercontent.com/86806643/194710474-193c4185-75a8-4a54-8988-dff60502e2e9.png)
+* Cosine Similarity Formulünü kullanarak verilen 2 girdinin benzerliği hesaplanıyor.
+* 1'den cosine similarity değerini (benzerlik oranı) çıkardığımızda ise girdilerin farkı bulunuyor.(Cosine Distance)
